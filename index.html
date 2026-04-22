@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Difficult Conversations</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap');
+ 
+  :root {
+    --ink: #1a1410;
+    --paper: #f5f0e8;
+    --warm: #c8855a;
+    --cool: #4a7c8e;
+    --muted: #8a7e72;
+    --line: #d9d0c4;
+    --highlight: #e8d5b0;
+  }
+ 
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+ 
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+ 
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.6;
+  }
+ 
+  header {
+    padding: 3rem 2rem 2rem;
+    max-width: 860px;
+    margin: 0 auto;
+    border-bottom: 2px solid var(--ink);
+    position: relative;
+  }
+ 
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--warm);
+    margin-bottom: 0.75rem;
+  }
+ 
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+ 
+  h1 em {
+    font-style: italic;
+    color: var(--warm);
+  }
+ 
+  .subtitle {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 480px;
+    line-height: 1.6;
+  }
+ 
+  /* Tab nav */
+  .tab-nav {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    padding: 0 2rem;
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+  }
+ 
+  .tab-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 1.2rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -1px;
+  }
+ 
+  .tab-btn:hover { color: var(--ink); }
+  .tab-btn.active {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+ 
+  /* Panels */
+  .panel { display: none; max-width: 860px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+  .panel.active { display: block; animation: fadeIn 0.3s ease; }
+ 
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+ 
+  /* Section heading */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+ 
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+  }
+ 
+  /* Framework cards */
+  .framework-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    margin-bottom: 2.5rem;
+  }
+ 
+  .framework-card {
+    background: var(--paper);
+    padding: 1.8rem;
+    transition: background 0.2s;
+  }
+ 
+  .framework-card:hover { background: var(--highlight); }
+ 
+  .card-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--line);
+    margin-bottom: 0.75rem;
+  }
+ 
+  .card-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--warm);
+    margin-bottom: 0.5rem;
+  }
+ 
+  .card-body {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--ink);
+    font-weight: 300;
+  }
+ 
+  /* The 3 conversations model */
+  .three-model {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    margin-bottom: 2.5rem;
+  }
+ 
+  @media (max-width: 600px) {
+    .three-model { grid-template-columns: 1fr; }
+    .framework-grid { grid-template-columns: 1fr; }
+  }
+ 
+  .model-cell {
+    background: var(--paper);
+    padding: 1.5rem;
+  }
+ 
+  .model-cell:nth-child(2) { background: var(--ink); color: var(--paper); }
+  .model-cell:nth-child(2) .model-label { color: var(--warm); }
+  .model-cell:nth-child(2) .model-body { color: #c8bfb5; }
+ 
+  .model-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--warm);
+    margin-bottom: 0.5rem;
+  }
+ 
+  .model-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+ 
+  .model-body {
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--muted);
+    font-weight: 300;
+  }
+ 
+  /* Scripts / phrases */
+  .phrase-list { list-style: none; margin-bottom: 2rem; }
+ 
+  .phrase-item {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--line);
+    align-items: start;
+  }
+ 
+  .phrase-bullet {
+    width: 28px;
+    height: 28px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+ 
+  .phrase-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-style: italic;
+    line-height: 1.5;
+    margin-bottom: 0.3rem;
+  }
+ 
+  .phrase-note {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 300;
+    font-family: 'DM Sans', sans-serif;
+    font-style: normal;
+  }
+ 
+  /* Checklist */
+  .checklist { list-style: none; }
+ 
+  .check-item {
+    display: flex;
+    gap: 1rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    align-items: flex-start;
+  }
+ 
+  .check-box {
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid var(--ink);
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    font-size: 0.75rem;
+  }
+ 
+  .check-item.done .check-box {
+    background: var(--ink);
+    color: var(--paper);
+  }
+ 
+  .check-item.done .check-label { text-decoration: line-through; color: var(--muted); }
+ 
+  .check-label {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+ 
+  .check-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 300;
+    margin-top: 0.2rem;
+  }
+ 
+  /* Scenario practice */
+  .scenario-box {
+    border: 1px solid var(--ink);
+    padding: 1.8rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    background: var(--paper);
+  }
+ 
+  .scenario-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    position: absolute;
+    top: -0.55rem;
+    left: 1.2rem;
+    background: var(--warm);
+    color: var(--paper);
+    padding: 0.15rem 0.5rem;
+  }
+ 
+  .scenario-prompt {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    line-height: 1.5;
+    margin-bottom: 1.2rem;
+  }
+ 
+  .response-area {
+    width: 100%;
+    min-height: 100px;
+    background: var(--highlight);
+    border: none;
+    border-top: 1px solid var(--line);
+    padding: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    color: var(--ink);
+    resize: vertical;
+    outline: none;
+    line-height: 1.6;
+  }
+ 
+  .response-area::placeholder { color: var(--muted); }
+ 
+  .scenario-hint {
+    margin-top: 0;
+    padding: 0.9rem;
+    background: var(--highlight);
+    border-left: 3px solid var(--warm);
+    display: none;
+  }
+ 
+  .scenario-hint p {
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+ 
+  .hint-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid var(--muted);
+    color: var(--muted);
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+    margin-top: 0.9rem;
+    transition: all 0.2s;
+  }
+ 
+  .hint-btn:hover { border-color: var(--ink); color: var(--ink); }
+ 
+  /* Mistakes section */
+  .mistake-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    margin-bottom: 1px;
+  }
+ 
+  @media (max-width: 600px) { .mistake-row { grid-template-columns: 1fr; } }
+ 
+  .mistake-cell {
+    background: var(--paper);
+    padding: 1.2rem 1.5rem;
+  }
+ 
+  .mistake-cell.bad { background: #fdf0ec; }
+  .mistake-cell.good { background: #edf5f0; }
+ 
+  .cell-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+ 
+  .cell-tag.bad-tag { color: #b85c3a; }
+  .cell-tag.good-tag { color: #3a8a5c; }
+ 
+  .cell-text {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    font-style: italic;
+  }
+ 
+  /* Progress bar */
+  .progress-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+    background: var(--paper);
+  }
+ 
+  .progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+  }
+ 
+  .progress-bar {
+    height: 6px;
+    background: var(--line);
+    position: relative;
+  }
+ 
+  .progress-fill {
+    height: 100%;
+    background: var(--ink);
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+ 
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+ 
+  blockquote {
+    border-left: 3px solid var(--warm);
+    padding: 1rem 1.5rem;
+    margin: 2rem 0;
+    background: var(--highlight);
+  }
+ 
+  blockquote p {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+ 
+  blockquote cite {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    font-style: normal;
+  }
+ 
+  p.body {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    max-width: 600px;
+  }
+</style>
+</head>
+<body>
+ 
+<header>
+  <div class="eyebrow">Communication Skills</div>
+  <h1>Navigating <em>Difficult</em><br>Conversations</h1>
+  <p class="subtitle">A practical guide for work and personal life — frameworks, phrases, and practice scenarios.</p>
+</header>
+ 
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('framework')">Framework</button>
+  <button class="tab-btn" onclick="showTab('phrases')">Key Phrases</button>
+  <button class="tab-btn" onclick="showTab('mistakes')">Common Mistakes</button>
+  <button class="tab-btn" onclick="showTab('practice')">Practice</button>
+  <button class="tab-btn" onclick="showTab('prep')">Pre-Talk Checklist</button>
+</nav>
+ 
+<!-- FRAMEWORK -->
+<div class="panel active" id="panel-framework">
+ 
+  <p class="body">Most difficult conversations fail before they begin — not because of bad intentions, but because we're unconsciously playing out three separate conversations at once.</p>
+ 
+  <div class="section-label">The Core Model</div>
+  <h2>Every Hard Talk Is Actually Three</h2>
+ 
+  <div class="three-model">
+    <div class="model-cell">
+      <div class="model-label">Conversation 1</div>
+      <div class="model-title">What Happened</div>
+      <div class="model-body">The facts, events, and who did what. People argue about "the truth" when they actually have different stories.</div>
+    </div>
+    <div class="model-cell">
+      <div class="model-label">Conversation 2</div>
+      <div class="model-title">The Feelings</div>
+      <div class="model-body">The emotions underneath — hurt, fear, frustration, shame. Usually the real driver, rarely named.</div>
+    </div>
+    <div class="model-cell">
+      <div class="model-label">Conversation 3</div>
+      <div class="model-title">Identity</div>
+      <div class="model-body">What this says about me as a person. "Does this mean I'm a bad parent / bad colleague / bad friend?"</div>
+    </div>
+  </div>
+ 
+  <blockquote>
+    <p>The goal isn't to win the argument. It's to understand what's actually going on — for both of you.</p>
+    <cite>— Adapted from Stone, Patton & Heen, Difficult Conversations</cite>
+  </blockquote>
+ 
+  <div class="divider">The 5-Step Structure</div>
+ 
+  <div class="section-label">How to Structure the Talk</div>
+  <h2>A Sequence That Works</h2>
+ 
+  <div class="framework-grid">
+    <div class="framework-card">
+      <div class="card-num">01</div>
+      <div class="card-title">Prepare, Not Script</div>
+      <div class="card-body">Know your purpose and what outcome you'd call a success. Don't rehearse a monologue — prepare to listen as much as speak.</div>
+    </div>
+    <div class="framework-card">
+      <div class="card-num">02</div>
+      <div class="card-title">Start Neutral</div>
+      <div class="card-body">Open with what you've observed, not what you've concluded. "I noticed X" not "You always do X."</div>
+    </div>
+    <div class="framework-card">
+      <div class="card-num">03</div>
+      <div class="card-title">Invite Their Story</div>
+      <div class="card-body">Ask open questions early. Their perspective will almost always surprise you — and that surprise matters.</div>
+    </div>
+    <div class="framework-card">
+      <div class="card-num">04</div>
+      <div class="card-title">Name Feelings</div>
+      <div class="card-body">Acknowledge emotions — yours and theirs — without making them the weapon. Naming a feeling deflates it.</div>
+    </div>
+    <div class="framework-card">
+      <div class="card-num">05</div>
+      <div class="card-title">Problem-Solve Together</div>
+      <div class="card-body">Move from "whose fault" to "what now." Focus on what you both want going forward — that's the real conversation.</div>
+    </div>
+  </div>
+ 
+</div>
+ 
+<!-- PHRASES -->
+<div class="panel" id="panel-phrases">
+  <p class="body">The right words don't just sound better — they genuinely change how the other person hears you. Memorise a few of these and they'll become instinctive.</p>
+ 
+  <div class="section-label">Opening Lines</div>
+  <h2>Words That Open Doors</h2>
+ 
+  <ul class="phrase-list">
+    <li class="phrase-item">
+      <div class="phrase-bullet">01</div>
+      <div>
+        <div class="phrase-text">"I want to talk about something that's been on my mind, and I want to make sure I understand your perspective too."</div>
+        <div class="phrase-note">Sets a collaborative tone from the start. Signals you're not there to attack.</div>
+      </div>
+    </li>
+    <li class="phrase-item">
+      <div class="phrase-bullet">02</div>
+      <div>
+        <div class="phrase-text">"I might be getting this wrong, but here's how it landed for me…"</div>
+        <div class="phrase-note">Disarms defensiveness by owning your interpretation as just that — yours.</div>
+      </div>
+    </li>
+    <li class="phrase-item">
+      <div class="phrase-bullet">03</div>
+      <div>
+        <div class="phrase-text">"Help me understand — what was going on for you in that moment?"</div>
+        <div class="phrase-note">Invites their story. Often reveals context you completely missed.</div>
+      </div>
+    </li>
+    <li class="phrase-item">
+      <div class="phrase-bullet">04</div>
+      <div>
+        <div class="phrase-text">"I'm not saying you meant to, but the impact on me was…"</div>
+        <div class="phrase-note">Separates intent from impact. One of the most powerful distinctions in conflict.</div>
+      </div>
+    </li>
+    <li class="phrase-item">
+      <div class="phrase-bullet">05</div>
+      <div>
+        <div class="phrase-text">"It sounds like this has been frustrating for you too."</div>
+        <div class="phrase-note">Reflects back their emotion. People calm down when they feel truly heard.</div>
+      </div>
+    </li>
+    <li class="phrase-item">
+      <div class="phrase-bullet">06</div>
+      <div>
+        <div class="phrase-text">"I care about our relationship / working together, which is why I wanted to have this conversation."</div>
+        <div class="phrase-note">Grounds the conversation in care, not complaint. Works in both personal and professional contexts.</div>
+      </div>
+    </li>
+    <li class="phrase-item">
+      <div class="phrase-bullet">07</div>
+      <div>
+        <div class="phrase-text">"What would feel like a good outcome for you here?"</div>
+        <div class="phrase-note">Pivots toward solutions. Most people haven't been asked this and it changes the energy.</div>
+      </div>
+    </li>
+    <li class="phrase-item">
+      <div class="phrase-bullet">08</div>
+      <div>
+        <div class="phrase-text">"I need a moment to think about that."</div>
+        <div class="phrase-note">Buys you time without deflecting. Far better than filling silence with words you'll regret.</div>
+      </div>
+    </li>
+  </ul>
+</div>
+ 
+<!-- MISTAKES -->
+<div class="panel" id="panel-mistakes">
+  <p class="body">Knowing what <em>not</em> to do is just as powerful as knowing what to do. These are the most common patterns that derail hard conversations — and what to say instead.</p>
+ 
+  <div class="section-label">Before You Speak</div>
+  <h2>Avoid These Patterns</h2>
+ 
+  <div class="mistake-row">
+    <div class="mistake-cell bad">
+      <div class="cell-tag bad-tag">❌ Derails</div>
+      <div class="cell-text">"You always do this." / "You never listen."</div>
+    </div>
+    <div class="mistake-cell good">
+      <div class="cell-tag good-tag">✓ Opens</div>
+      <div class="cell-text">"This specific situation made me feel unheard — can we talk about it?"</div>
+    </div>
+  </div>
+ 
+  <div class="mistake-row">
+    <div class="mistake-cell bad">
+      <div class="cell-tag bad-tag">❌ Derails</div>
+      <div class="cell-text">"I know exactly why you did that." (mind-reading)</div>
+    </div>
+    <div class="mistake-cell good">
+      <div class="cell-tag good-tag">✓ Opens</div>
+      <div class="cell-text">"I'm not sure what was going on for you — can you help me understand?"</div>
+    </div>
+  </div>
+ 
+  <div class="mistake-row">
+    <div class="mistake-cell bad">
+      <div class="cell-tag bad-tag">❌ Derails</div>
+      <div class="cell-text">"That's not what happened." (competing stories)</div>
+    </div>
+    <div class="mistake-cell good">
+      <div class="cell-tag good-tag">✓ Opens</div>
+      <div class="cell-text">"I experienced it differently — can we each share what we remember?"</div>
+    </div>
+  </div>
+ 
+  <div class="mistake-row">
+    <div class="mistake-cell bad">
+      <div class="cell-tag bad-tag">❌ Derails</div>
+      <div class="cell-text">Burying the real issue under small talk, then ambushing them.</div>
+    </div>
+    <div class="mistake-cell good">
+      <div class="cell-tag good-tag">✓ Opens</div>
+      <div class="cell-text">"I'd like to find a time to talk about something important — when's good?"</div>
+    </div>
+  </div>
+ 
+  <div class="mistake-row">
+    <div class="mistake-cell bad">
+      <div class="cell-tag bad-tag">❌ Derails</div>
+      <div class="cell-text">Forcing a resolution in the moment when emotions are high.</div>
+    </div>
+    <div class="mistake-cell good">
+      <div class="cell-tag good-tag">✓ Opens</div>
+      <div class="cell-text">"We don't have to solve this right now. Let's just try to understand each other first."</div>
+    </div>
+  </div>
+ 
+  <div class="mistake-row">
+    <div class="mistake-cell bad">
+      <div class="cell-tag bad-tag">❌ Derails</div>
+      <div class="cell-text">"I'm not angry." (denying your own emotions)</div>
+    </div>
+    <div class="mistake-cell good">
+      <div class="cell-tag good-tag">✓ Opens</div>
+      <div class="cell-text">"I'm feeling more frustrated than I expected — I want to stay in this conversation though."</div>
+    </div>
+  </div>
+ 
+</div>
+ 
+<!-- PRACTICE -->
+<div class="panel" id="panel-practice">
+  <p class="body">The only way to get better at hard conversations is to practise them before they happen. Try these scenarios — write your opening, then reveal a suggested approach.</p>
+ 
+  <div class="scenario-box">
+    <div class="scenario-tag">Work</div>
+    <div class="scenario-prompt">A colleague keeps interrupting you in meetings. It's happened three times this week and your manager noticed. You need to address it without damaging the relationship.</div>
+    <textarea class="response-area" placeholder="Write your opening line or how you'd start this conversation…"></textarea>
+    <button class="hint-btn" onclick="toggleHint(this)">Show Suggested Approach</button>
+    <div class="scenario-hint">
+      <p><strong>Try:</strong> "Hey, I wanted to catch you quickly — I've noticed I've been getting cut off in a few of our recent meetings, including [meeting name]. I don't think you mean anything by it, but it's been throwing me off. Can we figure out a way to make sure we both get space to finish our points?"<br><br>
+      This names the specific behaviour, separates intent from impact, and moves directly to problem-solving.</p>
+    </div>
+  </div>
+ 
+  <div class="scenario-box">
+    <div class="scenario-tag">Personal</div>
+    <div class="scenario-prompt">A close friend has cancelled plans with you three times in a row. You're starting to feel like the friendship is one-sided, and it's hurting.</div>
+    <textarea class="response-area" placeholder="Write your opening line or how you'd start this conversation…"></textarea>
+    <button class="hint-btn" onclick="toggleHint(this)">Show Suggested Approach</button>
+    <div class="scenario-hint">
+      <p><strong>Try:</strong> "I miss spending time with you — and I want to say that before anything else. I've also been feeling a little disconnected lately after our last few plans fell through. I'm not trying to make you feel bad, I just wanted to check in — is everything okay with you?"<br><br>
+      Leading with care (not accusation) and asking about them first often reveals something you didn't know — and creates space for honesty.</p>
+    </div>
+  </div>
+ 
+  <div class="scenario-box">
+    <div class="scenario-tag">Work</div>
+    <div class="scenario-prompt">You need to tell your manager that their feedback style is demoralising you — it's often public and vague, and it's affecting your confidence.</div>
+    <textarea class="response-area" placeholder="Write your opening line or how you'd start this conversation…"></textarea>
+    <button class="hint-btn" onclick="toggleHint(this)">Show Suggested Approach</button>
+    <div class="scenario-hint">
+      <p><strong>Try:</strong> "I'd love your advice on something — I want to grow and I want your feedback, but I've found I absorb it much better one-on-one rather than in group settings. Would you be open to giving me corrections privately going forward? I think I'd improve faster."<br><br>
+      Framing it as "what helps you perform better" rather than "what you do wrong" makes it easy for a manager to say yes.</p>
+    </div>
+  </div>
+ 
+  <div class="scenario-box">
+    <div class="scenario-tag">Personal</div>
+    <div class="scenario-prompt">A family member keeps making comments about your life choices (career, relationship, lifestyle). It's getting under your skin and you want it to stop without starting a family drama.</div>
+    <textarea class="response-area" placeholder="Write your opening line or how you'd start this conversation…"></textarea>
+    <button class="hint-btn" onclick="toggleHint(this)">Show Suggested Approach</button>
+    <div class="scenario-hint">
+      <p><strong>Try:</strong> "I know you care about me, and I appreciate that. But when comments come up about [X], I end up feeling judged rather than supported — even if that's not what you mean. It would mean a lot if we could leave that topic off the table."<br><br>
+      Acknowledge their good intention, name your experience clearly, and make a specific request. Avoid "you make me feel" — keep it about your experience.</p>
+    </div>
+  </div>
+</div>
+ 
+<!-- CHECKLIST -->
+<div class="panel" id="panel-prep">
+  <p class="body">Before entering a hard conversation, run through this checklist. The more boxes you can check, the better the outcome tends to be.</p>
+ 
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>Pre-Talk Readiness</span>
+      <span id="progress-count">0 / 12</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+ 
+  <div class="section-label">Before You Begin</div>
+  <h2>Pre-Conversation Checklist</h2>
+ 
+  <ul class="checklist" id="checklist">
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I know my core purpose</div>
+        <div class="check-sub">I can state in one sentence what I'm trying to achieve, not just what I want to say.</div>
+      </div>
+    </li>
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I've examined my own contribution</div>
+        <div class="check-sub">I've honestly considered how I may have played a role in the situation.</div>
+      </div>
+    </li>
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I'm emotionally regulated right now</div>
+        <div class="check-sub">I'm not entering this conversation in a reactive or flooded state.</div>
+      </div>
+    </li>
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I've chosen the right time and place</div>
+        <div class="check-sub">The setting is private, we're not rushed, and it's not right before something stressful.</div>
+      </div>
+    </li>
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I'm ready to be surprised</div>
+        <div class="check-sub">I've considered that they may have context or a perspective I haven't imagined.</div>
+      </div>
+    </li>
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I can name the feeling underneath</div>
+        <div class="check-sub">I know what emotion is actually driving this — beyond the surface irritation.</div>
+      </div>
+    </li>
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I know my opening line</div>
+        <div class="check-sub">I have a neutral, non-blaming first sentence ready to go.</div>
+      </div>
+    </li>
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I've separated intent from impact</div>
+        <div class="check-sub">I'm not going in assuming they meant harm — I'm addressing the effect on me.</div>
+      </div>
+    </li>
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I have a sense of what "good enough" looks like</div>
+        <div class="check-sub">I'm not expecting a perfect resolution — I know what a small win would look like.</div>
+      </div>
+    </li>
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I'm willing to listen, not just speak</div>
+        <div class="check-sub">I'm genuinely open to hearing their experience, not just waiting for my turn.</div>
+      </div>
+    </li>
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I'm not going in with an ultimatum</div>
+        <div class="check-sub">Unless truly necessary, I'm leaving space for dialogue rather than demands.</div>
+      </div>
+    </li>
+    <li class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"></div>
+      <div>
+        <div class="check-label">I care about the relationship</div>
+        <div class="check-sub">I'm having this conversation because I value the person or the working relationship.</div>
+      </div>
+    </li>
+  </ul>
+</div>
+ 
+<script>
+  function showTab(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    event.target.classList.add('active');
+  }
+ 
+  function toggleHint(btn) {
+    const hint = btn.nextElementSibling;
+    if (hint.style.display === 'block') {
+      hint.style.display = 'none';
+      btn.textContent = 'Show Suggested Approach';
+    } else {
+      hint.style.display = 'block';
+      btn.textContent = 'Hide Approach';
+    }
+  }
+ 
+  function toggleCheck(item) {
+    item.classList.toggle('done');
+    item.querySelector('.check-box').textContent = item.classList.contains('done') ? '✓' : '';
+    updateProgress();
+  }
+ 
+  function updateProgress() {
+    const total = document.querySelectorAll('.check-item').length;
+    const done = document.querySelectorAll('.check-item.done').length;
+    document.getElementById('progress-count').textContent = done + ' / ' + total;
+    document.getElementById('progress-fill').style.width = (done / total * 100) + '%';
+  }
+</script>
+</body>
